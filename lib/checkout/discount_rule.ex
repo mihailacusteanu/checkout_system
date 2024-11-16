@@ -38,8 +38,10 @@ defmodule CheckoutSystem.Checkout.DiscountRule do
   def apply_discount(
         item_count,
         price,
-        discount_strategy: %{
-          type: :get_some_free
+        %{
+          discount_strategy: %{
+            type: :get_some_free
+          }
         }
       ) do
     price * item_count
