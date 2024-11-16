@@ -1,21 +1,70 @@
 # CheckoutSystem
 
-**TODO: Add description**
+**Used for calculating total cart value, based on a list of items (their discount rules and prices)
 
-## Installation
+## Running the code
+*assuming elixir and erlang is installed with the versions from .tool-versions
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `checkout_system` to your list of dependencies in `mix.exs`:
+1. Fetch the dependecies with `mix deps.get`
+2. Run iex using `iex -S mix`
+3. define inside iex the discount rules:
 
-```elixir
-def deps do
-  [
-    {:checkout_system, "~> 0.1.0"}
-  ]
-end
 ```
+discount_rules = %{
+    "GR1" => %{
+      product_code: "GR1",
+      min_items_for_discount: 2,
+      discount_strategy: %{
+        type: :get_some_free,
+        free_items_received: 1
+      }
+    },
+    "SR1" => %{
+      product_code: "SR1",
+      min_items_for_discount: 3,
+      discount_strategy: %{
+        type: :price_drop,
+        price_drop: 4.5
+      }
+    },
+    "CF1" => %{
+      product_code: "CF1",
+      min_items_for_discount: 3,
+      discount_strategy: %{
+        type: :percentage_discount,
+        percentage_discount: 33.33
+      }
+    }
+  }
+```
+4. also define the prices
+   `
+   prices = %{
+        "GR1" => 3.11,
+        "SR1" => 5.00,
+        "CF1" => 11.23
+      }`
+5. Update the agent with with the prices and discounts
+   ` Agent.start_link(
+        fn ->
+          %{prices: prices, discounts: discount_rules}
+        end,
+        name: :prices_and_discounts
+      )`     
+6. Run in iex the examples from the *Technical evaluation*
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/checkout_system>.
+`CheckoutSystem.Checkout.Cart.calculate_total(["GR1", "SR1", "GR1", "GR1", "CF1"])`
 
+22.45
+
+`CheckoutSystem.Checkout.Cart.calculate_total(["GR1", "GR1"])`
+
+3.11
+
+`CheckoutSystem.Checkout.Cart.calculate_total(["SR1", "SR1", "GR1", "SR1"])`
+
+16.61
+
+`CheckoutSystem.Checkout.Cart.calculate_total(["GR1", "CF1", "SR1", "CF1", "CF1"])`
+
+30.57
