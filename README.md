@@ -1,6 +1,6 @@
 # CheckoutSystem
 
-**Used for calculating total cart value, based on a list of items (their discount rules and prices)
+## Used for calculating total cart value, based on a list of items (their discount rules and prices)
 
 ## Running the code
 *assuming elixir and erlang is installed with the versions from .tool-versions
@@ -44,13 +44,10 @@ discount_rules = %{
         "SR1" => 5.00,
         "CF1" => 11.23
       }`
-5. Update the agent with with the prices and discounts
-   ` Agent.start_link(
-        fn ->
-          %{prices: prices, discounts: discount_rules}
-        end,
-        name: :prices_and_discounts
-      )`     
+5. Update in iex the prices
+   `CheckoutSystem.Checkout.Cart.update_prices(prices)`
+   and the discounts
+   `CheckoutSystem.Checkout.Cart.update_discounts(discount_rules)`     
 6. Run in iex the examples from the *Technical evaluation*
 
 `CheckoutSystem.Checkout.Cart.calculate_total(["GR1", "SR1", "GR1", "GR1", "CF1"])`
