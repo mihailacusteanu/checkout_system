@@ -222,4 +222,85 @@ defmodule Checkout.CartTest do
       assert Cart.calculate_total(cart, @discount_rules) == 30.57
     end
   end
+
+  describe "generate cart from list of products" do
+    test "and succeed" do
+      price = %{
+        "GR1" => 3.11,
+        "SR1" => 5.00,
+        "CF1" => 11.23
+      }
+
+      list_of_product_codes = ["GR1", "CF1", "SR1", "CF1", "GR1", "GR1"]
+
+      assert Cart.generate_cart(list_of_product_codes, price) == [
+               %{
+                 item_count: 2,
+                 product_code: "CF1",
+                 price: 11.23
+               },
+               %{
+                 item_count: 3,
+                 product_code: "GR1",
+                 price: 3.11
+               },
+               %{
+                 item_count: 1,
+                 product_code: "SR1",
+                 price: 5.00
+               }
+             ]
+    end
+  end
+
+  describe "calculate total from a list of product code" do
+    test "when prices_and_discounts is not initialized" do
+      assert Cart.calculate_total(["GR1", "SR1", "CF1"]) ==
+               {:error, {:cart_calculate_total, "prices_and_discounts not initialized"}}
+    end
+
+    test "when prices_and_discounts is initialized and having multiple items: GR1,SR1,GR1,GR1,CF1" do
+      Agent.start_link(
+        fn ->
+          %{prices: %{"GR1" => 3.11, "SR1" => 5.00, "CF1" => 11.23}, discounts: @discount_rules}
+        end,
+        name: :prices_and_discounts
+      )
+
+      assert Cart.calculate_total(["GR1", "SR1", "GR1", "GR1", "CF1"]) == 22.45
+    end
+
+    test "when prices_and_discounts is initialized and having multiple items: GR1,GR1" do
+      Agent.start_link(
+        fn ->
+          %{prices: %{"GR1" => 3.11, "SR1" => 5.00, "CF1" => 11.23}, discounts: @discount_rules}
+        end,
+        name: :prices_and_discounts
+      )
+
+      assert Cart.calculate_total(["GR1", "GR1"]) == 3.11
+    end
+
+    test "when prices_and_discounts is initialized and having multiple items: SR1,SR1,GR1,SR1" do
+      Agent.start_link(
+        fn ->
+          %{prices: %{"GR1" => 3.11, "SR1" => 5.00, "CF1" => 11.23}, discounts: @discount_rules}
+        end,
+        name: :prices_and_discounts
+      )
+
+      assert Cart.calculate_total(["SR1", "SR1", "GR1", "SR1"]) == 16.61
+    end
+
+    test "when prices_and_discounts is initialized and having multiple items: GR1,CF1,SR1,CF1,CF1" do
+      Agent.start_link(
+        fn ->
+          %{prices: %{"GR1" => 3.11, "SR1" => 5.00, "CF1" => 11.23}, discounts: @discount_rules}
+        end,
+        name: :prices_and_discounts
+      )
+
+      assert Cart.calculate_total(["GR1", "CF1", "SR1", "CF1", "CF1"]) == 30.57
+    end
+  end
 end
