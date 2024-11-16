@@ -21,6 +21,8 @@ defmodule CheckoutSystem.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ecto, "~> 3.12.4"},
+
       #  only for test
       {:mix_test_interactive, "~> 4.1.1", only: :dev, runtime: false},
 
