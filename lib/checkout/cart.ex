@@ -64,4 +64,32 @@ defmodule CheckoutSystem.Checkout.Cart do
       discount_rule
     )
   end
+
+  def update_prices(prices) do
+    case Process.whereis(:prices_and_discounts) do
+      nil ->
+        Agent.start_link(fn -> %{prices: prices, discounts: %{}} end, name: :prices_and_discounts)
+
+      _ ->
+        Agent.update(
+          :prices_and_discounts,
+          fn %{prices: _, discounts: discounts} -> %{prices: prices, discounts: discounts} end
+        )
+    end
+  end
+
+  def update_discounts(discounts) do
+    case Process.whereis(:prices_and_discounts) do
+      nil ->
+        Agent.start_link(fn -> %{prices: %{}, discounts: discounts} end,
+          name: :prices_and_discounts
+        )
+
+      _ ->
+        Agent.update(
+          :prices_and_discounts,
+          fn %{prices: prices, discounts: _} -> %{prices: prices, discounts: discounts} end
+        )
+    end
+  end
 end
