@@ -116,4 +116,42 @@ defmodule DiscountRuleTest do
                4.5
     end
   end
+
+  describe "apply a fixed :price_drop from item price to a fixed price" do
+    test "when you get a price drop from 3.11 to 2.99 when you order 2 items" do
+      discount_rule = %{
+        product_code: "RND1",
+        min_items_for_discount: 2,
+        discount_strategy: %{
+          type: :price_drop,
+          price_drop: 2.99
+        }
+      }
+
+      assert DiscountRule.apply_discount(
+               _item_count = 2,
+               _price = 3.11,
+               discount_rule
+             ) ==
+               5.98
+    end
+
+    test "and fail to drop the price because the item count is less than the minimum items for discount" do
+      discount_rule = %{
+        product_code: "RND1",
+        min_items_for_discount: 3,
+        discount_strategy: %{
+          type: :price_drop,
+          price_drop: 2.99
+        }
+      }
+
+      assert DiscountRule.apply_discount(
+               _item_count = 2,
+               _price = 3.11,
+               discount_rule
+             ) ==
+               6.22
+    end
+  end
 end
