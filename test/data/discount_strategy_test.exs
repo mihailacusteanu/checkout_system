@@ -29,4 +29,34 @@ defmodule CheckoutSystem.Data.DiscountStrategyTest do
       assert TestHelper.traverse_errors(changeset) == %{type: ["is invalid"]}
     end
   end
+
+  describe "validate_optional_field_based_on_type/1" do
+    test "when type is :get_some_free and free_items_received is not present" do
+      changeset = DataDiscountStrategy.changeset(%DataDiscountStrategy{}, %{type: :get_some_free})
+
+      refute changeset.valid?
+      assert TestHelper.traverse_errors(changeset) == %{free_items_received: ["can't be blank"]}
+    end
+
+    test "when type is :percentage_discount and free_items_received is present" do
+      changeset =
+        DataDiscountStrategy.changeset(%DataDiscountStrategy{}, %{
+          type: :percentage_discount,
+          free_items_received: 1
+        })
+
+      refute changeset.valid?
+      assert TestHelper.traverse_errors(changeset) == %{percentage_discount: ["can't be blank"]}
+    end
+
+    test "when type is :price_drop" do
+      changeset = DataDiscountStrategy.changeset(%DataDiscountStrategy{}, %{
+        type: :price_drop,
+        free_items_received: 1
+      })
+
+      refute changeset.valid?
+      assert TestHelper.traverse_errors(changeset) == %{price_drop: ["can't be blank"]}
+    end
+  end
 end
