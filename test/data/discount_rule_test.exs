@@ -32,7 +32,10 @@ defmodule Data.DiscountRuleTest do
         CheckoutSystem.Data.DiscountRule.changeset(%CheckoutSystem.Data.DiscountRule{}, params)
 
       refute changeset.valid?
-      assert TestHelper.traverse_errors(changeset) == %{discount_strategy: %{type: ["is invalid"]}}
+
+      assert TestHelper.traverse_errors(changeset) == %{
+               discount_strategy: %{type: ["is invalid"]}
+             }
     end
   end
 end

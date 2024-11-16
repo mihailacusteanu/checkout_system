@@ -44,4 +44,31 @@ defmodule CheckoutSystem.Checkout.DiscountRule do
       ) do
     price * item_count
   end
+
+  def apply_discount(
+        item_count,
+        price,
+        %{
+          min_items_for_discount: min_items_for_discount,
+          discount_strategy: %{
+            type: :percentage_discount,
+            percentage_discount: percentage_discount
+          }
+        }
+      )
+      when item_count >= min_items_for_discount do
+    price * item_count * (1 - percentage_discount / 100)
+  end
+
+  def apply_discount(
+        item_count,
+        price,
+        %{
+          discount_strategy: %{
+            type: :percentage_discount
+          }
+        }
+      ) do
+    price * item_count
+  end
 end

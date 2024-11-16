@@ -50,10 +50,11 @@ defmodule CheckoutSystem.Data.DiscountStrategyTest do
     end
 
     test "when type is :price_drop" do
-      changeset = DataDiscountStrategy.changeset(%DataDiscountStrategy{}, %{
-        type: :price_drop,
-        free_items_received: 1
-      })
+      changeset =
+        DataDiscountStrategy.changeset(%DataDiscountStrategy{}, %{
+          type: :price_drop,
+          free_items_received: 1
+        })
 
       refute changeset.valid?
       assert TestHelper.traverse_errors(changeset) == %{price_drop: ["can't be blank"]}
